@@ -5,13 +5,16 @@
       <div class="form-group">
         <label for="" class="text-grey">Companies</label>
 
+        <p v-if="$fetchState.pending">Fetching Companies ...</p>
         <select
+          v-if="companies.data"
+          v-model="selectedCompany"
           name="companies"
           id=""
           class="appearance-none input-field form-icon-chevron_down"
         >
-          <option>
-            Company Name
+          <option :value="company.id" v-for="company in companies.data.result.data">
+            {{ company.name }}
           </option>
         </select>
       </div>
@@ -28,6 +31,25 @@
 
 <script>
 export default {
-  middleware: 'auth'
+  middleware: 'auth',
+  data() {
+    return {
+      companies: [],
+      selectedCompany: ''
+    }
+  },
+  async fetch() {
+    this.companies = await this.$axios.get('/company?limit=100')
+  },
+  methods: {
+    openCompany() {
+      this.$router.push({
+        name: 'companies-id',
+        params: {
+          id: this.selectedCompany
+        }
+      })
+    }
+  }
 }
 </script>
